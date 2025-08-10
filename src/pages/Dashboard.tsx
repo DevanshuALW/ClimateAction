@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Zap, Droplet, Car, ShoppingBag, Leaf, ArrowRight } from 'lucide-react';
+import { Zap, Droplet, Leaf, ArrowRight } from 'lucide-react';
 import EnvironmentalData from '../components/EnvironmentalData';
 import ChallengeCard from '../components/ChallengeCard';
 
@@ -64,9 +64,9 @@ const Dashboard: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { title: 'Carbon Saved', value: '2.4 tons', icon: <Leaf className="text-emerald-500\" size={24} />, color: 'bg-emerald-50 border-emerald-200' },
+            { title: 'Carbon Saved', value: '2.4 tons', icon: <Leaf className="text-emerald-500" size={24} />, color: 'bg-emerald-50 border-emerald-200' },
             { title: 'Energy Usage', value: '-15%', icon: <Zap className="text-amber-500" size={24} />, color: 'bg-amber-50 border-amber-200' },
-            { title: 'Water Saved', value: '340 gal', icon: <Droplet className="text-blue-500\" size={24} />, color: 'bg-blue-50 border-blue-200' },
+            { title: 'Water Saved', value: '340 gal', icon: <Droplet className="text-blue-500" size={24} />, color: 'bg-blue-50 border-blue-200' },
             { title: 'Eco Points', value: '1,240', icon: <Leaf className="text-purple-500" size={24} />, color: 'bg-purple-50 border-purple-200' },
           ].map((stat, i) => (
             <motion.div

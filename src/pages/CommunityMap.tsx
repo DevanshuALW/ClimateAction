@@ -89,16 +89,6 @@ const CommunityMap: React.FC = () => {
     }
   };
 
-  const getCategoryIcon = (category: string) => {
-    switch(category) {
-      case 'cleanup': return '🧹';
-      case 'gardening': return '🌱';
-      case 'planting': return '🌳';
-      case 'education': return '📚';
-      default: return '📍';
-    }
-  };
-
   return (
     <div className="space-y-6">
       <div className="mb-6">
@@ -129,26 +119,52 @@ const CommunityMap: React.FC = () => {
               </div>
             </div>
             
-            {/* This is a placeholder for the actual map */}
-            <div className="w-full h-full bg-emerald-50 flex items-center justify-center">
-              <div className="text-center max-w-md p-6">
-                <h3 className="text-lg font-medium mb-2">Map Visualization</h3>
-                <p className="text-gray-600 mb-4">
-                  This would display an interactive map showing all community events.
-                  Users could click on markers to see event details.
-                </p>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  {['all', 'cleanup', 'gardening', 'planting', 'education'].map(category => (
-                    <div key={category} className="flex items-center space-x-1">
-                      <span className="inline-block w-3 h-3 rounded-full" style={{ 
-                        backgroundColor: category === 'all' ? '#6b7280' : getCategoryColor(category) 
-                      }}></span>
-                      <span>{category === 'all' ? 'All' : category.charAt(0).toUpperCase() + category.slice(1)}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <Map
+              {...viewState}
+              onMove={evt => setViewState(evt.viewState)}
+              style={{ width: '100%', height: '100%' }}
+              mapStyle="mapbox://styles/mapbox/streets-v11"
+              mapboxAccessToken="YOUR_MAPBOX_ACCESS_TOKEN" // TODO: Replace with your Mapbox access token
+            >
+              <NavigationControl />
+              {filteredEvents.map(event => (
+                <Marker
+                  key={event.id}
+                  latitude={event.coords.latitude}
+                  longitude={event.coords.longitude}
+                  onClick={(e) => {
+                    e.originalEvent.stopPropagation();
+                    setSelectedEvent(event.id);
+                  }}
+                >
+                  <button
+                    className="transform transition-transform hover:scale-110"
+                    style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                  >
+                    <MapPin
+                      size={32}
+                      color={getCategoryColor(event.category)}
+                      fill={`${getCategoryColor(event.category)}80`}
+                    />
+                  </button>
+                </Marker>
+              ))}
+
+              {selectedEvent && (
+                <Popup
+                  latitude={communityEvents.find(e => e.id === selectedEvent)!.coords.latitude}
+                  longitude={communityEvents.find(e => e.id === selectedEvent)!.coords.longitude}
+                  onClose={() => setSelectedEvent(null)}
+                  closeOnClick={false}
+                  offset={30}
+                >
+                  <div>
+                    <h3 className="font-bold">{communityEvents.find(e => e.id === selectedEvent)!.title}</h3>
+                    <p>{communityEvents.find(e => e.id === selectedEvent)!.location}</p>
+                  </div>
+                </Popup>
+              )}
+            </Map>
           </div>
         </div>
 

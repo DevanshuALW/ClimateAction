@@ -2,38 +2,22 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   User, Edit, Award, Settings, LogOut, ArrowRight, 
-  Leaf, Map, ShoppingBag, Clock, Zap, Droplet 
+  Leaf, Clock, Zap, Droplet
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { useUser } from '../context/UserContext';
 
 const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  
-  // Sample user data
-  const userData = {
-    name: 'Emma Johnson',
-    email: 'emma@example.com',
-    location: 'Seattle, WA',
-    joinDate: 'March 2025',
-    avatar: 'https://images.pexels.com/photos/3771807/pexels-photo-3771807.jpeg?auto=compress&cs=tinysrgb&w=400',
-    stats: {
-      carbonSaved: '3.2 tons',
-      activeChallenges: 2,
-      completedChallenges: 7,
-      ecoPoints: 1240,
-      trees: 12,
-      waterSaved: '2,450 gal'
-    }
-  };
+  const { user, stats, badges, activityFeed, updateUser } = useUser();
+  const [name, setName] = useState(user.name);
+  const [email, setEmail] = useState(user.email);
+  const [location, setLocation] = useState(user.location);
 
-  // Sample badges
-  const badges = [
-    { id: 1, name: 'Early Adopter', description: 'Joined ClimateAction in our first month', icon: '🌱' },
-    { id: 2, name: 'Challenge Champion', description: 'Completed 5+ eco challenges', icon: '🏆' },
-    { id: 3, name: 'Carbon Reducer', description: 'Reduced carbon footprint by 20%', icon: '🌍' },
-    { id: 4, name: 'Community Leader', description: 'Organized a local climate initiative', icon: '👥' },
-    { id: 5, name: 'Eco Shopper', description: 'Made 10+ purchases from sustainable brands', icon: '🛍️' }
-  ];
+  const handleSaveChanges = () => {
+    updateUser({ name, email, location });
+    // In a real app, you'd probably show a success message
+  };
 
   // Sample impact history
   const impactHistory = [
@@ -44,46 +28,14 @@ const Profile: React.FC = () => {
     { month: 'May', carbon: 290 },
   ];
 
-  // Sample activity feed
-  const activityFeed = [
-    { 
-      id: 1, 
-      type: 'challenge',
-      title: 'Completed "Zero Waste Week" challenge',
-      date: '2 days ago',
-      icon: <Award className="text-amber-500" size={18} />
-    },
-    { 
-      id: 2, 
-      type: 'footprint',
-      title: 'Reduced carbon footprint by 12% this month',
-      date: '1 week ago',
-      icon: <Leaf className="text-emerald-500\" size={18} />
-    },
-    { 
-      id: 3, 
-      type: 'community',
-      title: 'Joined Beach Cleanup event',
-      date: '2 weeks ago',
-      icon: <Map className="text-blue-500" size={18} />
-    },
-    { 
-      id: 4, 
-      type: 'purchase',
-      title: 'Purchased Reusable Produce Bags',
-      date: '3 weeks ago',
-      icon: <ShoppingBag className="text-purple-500\" size={18} />
-    }
-  ];
-
   return (
     <div className="space-y-8">
       <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
         <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6">
           <div className="relative">
             <img 
-              src={userData.avatar} 
-              alt={userData.name}
+              src={user.avatar}
+              alt={user.name}
               className="w-24 h-24 rounded-full object-cover border-2 border-emerald-500"
             />
             <button className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-md border border-gray-200">
@@ -92,9 +44,9 @@ const Profile: React.FC = () => {
           </div>
           
           <div className="text-center md:text-left">
-            <h1 className="text-2xl font-bold text-gray-800">{userData.name}</h1>
-            <p className="text-gray-600">{userData.location}</p>
-            <p className="text-sm text-gray-500">Member since {userData.joinDate}</p>
+            <h1 className="text-2xl font-bold text-gray-800">{user.name}</h1>
+            <p className="text-gray-600">{user.location}</p>
+            <p className="text-sm text-gray-500">Member since {user.joinDate}</p>
             
             <div className="mt-3 flex flex-wrap justify-center md:justify-start gap-2">
               <button className="px-3 py-1 text-sm bg-emerald-100 text-emerald-700 rounded-md flex items-center">
@@ -112,7 +64,7 @@ const Profile: React.FC = () => {
           <div className="md:ml-auto">
             <div className="bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-lg px-4 py-3 text-center">
               <h3 className="text-sm text-emerald-700 font-medium mb-1">Your Eco Points</h3>
-              <p className="text-2xl font-bold text-emerald-800">{userData.stats.ecoPoints}</p>
+                    <p className="text-2xl font-bold text-emerald-800">{stats.ecoPoints}</p>
               <button className="text-xs text-emerald-600 mt-1 flex items-center justify-center">
                 Redeem Points <ArrowRight size={12} className="ml-1" />
               </button>
@@ -123,12 +75,12 @@ const Profile: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {[
-          { title: 'Carbon Saved', value: userData.stats.carbonSaved, icon: <Leaf size={20} className="text-emerald-500" /> },
-          { title: 'Active Challenges', value: userData.stats.activeChallenges, icon: <Award size={20} className="text-amber-500" /> },
-          { title: 'Completed Challenges', value: userData.stats.completedChallenges, icon: <Clock size={20} className="text-blue-500" /> },
-          { title: 'Trees Planted', value: userData.stats.trees, icon: <Leaf size={20} className="text-green-500" /> },
+          { title: 'Carbon Saved', value: stats.carbonSaved, icon: <Leaf size={20} className="text-emerald-500" /> },
+          { title: 'Active Challenges', value: stats.activeChallenges, icon: <Award size={20} className="text-amber-500" /> },
+          { title: 'Completed Challenges', value: stats.completedChallenges, icon: <Clock size={20} className="text-blue-500" /> },
+          { title: 'Trees Planted', value: stats.trees, icon: <Leaf size={20} className="text-green-500" /> },
           { title: 'Energy Saved', value: '435 kWh', icon: <Zap size={20} className="text-yellow-500" /> },
-          { title: 'Water Saved', value: userData.stats.waterSaved, icon: <Droplet size={20} className="text-cyan-500" /> },
+          { title: 'Water Saved', value: stats.waterSaved, icon: <Droplet size={20} className="text-cyan-500" /> },
         ].map((stat, i) => (
           <motion.div
             key={stat.title}
@@ -280,7 +232,8 @@ const Profile: React.FC = () => {
                       <input 
                         type="text" 
                         className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        defaultValue={userData.name}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                       />
                     </div>
                     <div>
@@ -288,7 +241,8 @@ const Profile: React.FC = () => {
                       <input 
                         type="email" 
                         className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        defaultValue={userData.email}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                       />
                     </div>
                     <div>
@@ -296,7 +250,8 @@ const Profile: React.FC = () => {
                       <input 
                         type="text" 
                         className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        defaultValue={userData.location}
+                        value={location}
+                        onChange={(e) => setLocation(e.target.value)}
                       />
                     </div>
                   </div>
@@ -318,7 +273,10 @@ const Profile: React.FC = () => {
                 </div>
                 
                 <div className="pt-4 flex justify-end">
-                  <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                  <button
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                    onClick={handleSaveChanges}
+                  >
                     Save Changes
                   </button>
                 </div>

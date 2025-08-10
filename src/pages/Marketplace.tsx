@@ -1,115 +1,17 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Search, Filter, ShoppingBag, Star, Heart, 
-  Plus, Minus, ArrowRight, ChevronDown 
+  Search, ShoppingBag, Star, Heart,
+  ArrowRight, ChevronDown
 } from 'lucide-react';
+import { useMarketplace } from '../context/MarketplaceContext';
 
 const Marketplace: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortOrder, setSortOrder] = useState('popular');
-  const [cartCount, setCartCount] = useState(0);
   
-  // Sample product data
-  const products = [
-    {
-      id: 1,
-      name: 'Bamboo Toothbrush Set',
-      description: 'Pack of 4 biodegradable bamboo toothbrushes',
-      price: 12.99,
-      rating: 4.8,
-      reviews: 124,
-      image: 'https://images.pexels.com/photos/3737599/pexels-photo-3737599.jpeg?auto=compress&cs=tinysrgb&w=600',
-      category: 'personal',
-      ecoScore: 9.2,
-      badges: ['Plastic-Free', 'Biodegradable']
-    },
-    {
-      id: 2,
-      name: 'Reusable Produce Bags',
-      description: 'Set of 8 mesh bags for grocery shopping',
-      price: 16.50,
-      rating: 4.6,
-      reviews: 89,
-      image: 'https://images.pexels.com/photos/5218022/pexels-photo-5218022.jpeg?auto=compress&cs=tinysrgb&w=600',
-      category: 'kitchen',
-      ecoScore: 8.8,
-      badges: ['Zero-Waste', 'Washable']
-    },
-    {
-      id: 3,
-      name: 'Solar Power Bank',
-      description: '20000mAh battery with solar charging capability',
-      price: 45.99,
-      rating: 4.3,
-      reviews: 210,
-      image: 'https://images.pexels.com/photos/6636487/pexels-photo-6636487.jpeg?auto=compress&cs=tinysrgb&w=600',
-      category: 'tech',
-      ecoScore: 7.5,
-      badges: ['Renewable Energy', 'Long-Lasting']
-    },
-    {
-      id: 4,
-      name: 'Stainless Steel Water Bottle',
-      description: 'Insulated 24oz bottle, keeps drinks cold for 24 hours',
-      price: 28.95,
-      rating: 4.9,
-      reviews: 315,
-      image: 'https://images.pexels.com/photos/4397836/pexels-photo-4397836.jpeg?auto=compress&cs=tinysrgb&w=600',
-      category: 'personal',
-      ecoScore: 9.4,
-      badges: ['Plastic-Free', 'Reusable']
-    },
-    {
-      id: 5,
-      name: 'Organic Cotton Tote Bag',
-      description: 'Heavy-duty shopping bag made from organic cotton',
-      price: 18.99,
-      rating: 4.7,
-      reviews: 156,
-      image: 'https://images.pexels.com/photos/5217977/pexels-photo-5217977.jpeg?auto=compress&cs=tinysrgb&w=600',
-      category: 'fashion',
-      ecoScore: 9.1,
-      badges: ['Organic', 'Fair Trade']
-    },
-    {
-      id: 6,
-      name: 'Beeswax Food Wraps',
-      description: 'Reusable alternative to plastic wrap, set of 3 sizes',
-      price: 22.00,
-      rating: 4.5,
-      reviews: 178,
-      image: 'https://images.pexels.com/photos/6157229/pexels-photo-6157229.jpeg?auto=compress&cs=tinysrgb&w=600',
-      category: 'kitchen',
-      ecoScore: 9.7,
-      badges: ['Zero-Waste', 'Biodegradable']
-    },
-    {
-      id: 7,
-      name: 'LED Solar Garden Lights',
-      description: 'Pack of 6 solar-powered pathway lights',
-      price: 34.99,
-      rating: 4.2,
-      reviews: 92,
-      image: 'https://images.pexels.com/photos/1108499/pexels-photo-1108499.jpeg?auto=compress&cs=tinysrgb&w=600',
-      category: 'home',
-      ecoScore: 8.3,
-      badges: ['Energy-Efficient', 'Solar-Powered']
-    },
-    {
-      id: 8,
-      name: 'Recycled Paper Notebook',
-      description: '100% post-consumer recycled paper, 80 pages',
-      price: 9.95,
-      rating: 4.4,
-      reviews: 67,
-      image: 'https://images.pexels.com/photos/4226896/pexels-photo-4226896.jpeg?auto=compress&cs=tinysrgb&w=600',
-      category: 'office',
-      ecoScore: 8.9,
-      badges: ['Recycled', 'Tree-Free']
-    }
-  ];
+  const { products, cart, addToCart, addToWishlist } = useMarketplace();
 
   // Filter products based on search query and category
   const filteredProducts = products
@@ -143,10 +45,6 @@ const Marketplace: React.FC = () => {
     if (score >= 7) return 'text-green-600';
     if (score >= 5) return 'text-yellow-600';
     return 'text-red-600';
-  };
-
-  const handleAddToCart = () => {
-    setCartCount(prev => prev + 1);
   };
 
   return (
@@ -206,9 +104,9 @@ const Marketplace: React.FC = () => {
             <button className="bg-emerald-600 text-white p-2 rounded-lg">
               <ShoppingBag size={20} />
             </button>
-            {cartCount > 0 && (
+            {cart.length > 0 && (
               <span className="absolute -top-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                {cartCount}
+                {cart.length}
               </span>
             )}
           </div>
@@ -244,7 +142,10 @@ const Marketplace: React.FC = () => {
                   alt={product.name}
                   className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
                 />
-                <button className="absolute top-3 right-3 p-1.5 bg-white/90 rounded-full hover:bg-white">
+                <button
+                  className="absolute top-3 right-3 p-1.5 bg-white/90 rounded-full hover:bg-white"
+                  onClick={() => addToWishlist(product.id)}
+                >
                   <Heart size={18} className="text-gray-600 hover:text-red-500 transition-colors" />
                 </button>
                 <div className="absolute bottom-3 left-3 flex flex-wrap gap-2">
@@ -282,7 +183,7 @@ const Marketplace: React.FC = () => {
                 
                 <button 
                   className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium transition-colors"
-                  onClick={handleAddToCart}
+                  onClick={() => addToCart(product.id)}
                 >
                   Add to Cart
                 </button>

@@ -1,153 +1,26 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  Award, Clock, Users, ArrowRight, Search, Filter, ChevronDown, 
-  Leaf, Zap, Droplet, ShoppingBag, Car, Home, Utensils
+  Award, Clock, Users, ArrowRight, Search, ChevronDown,
+  Leaf
 } from 'lucide-react';
+import { useChallenges } from '../context/ChallengeContext';
 
 const Challenges: React.FC = () => {
-  const [filter, setFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [difficultyFilter, setDifficultyFilter] = useState('all');
+  const [impactFilter, setImpactFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('discover');
   
-  // Sample challenges data
-  const challengesData = [
-    {
-      id: 1,
-      title: 'Meatless Monday',
-      description: 'Skip meat for one day a week to reduce your carbon footprint',
-      category: 'food',
-      difficulty: 'Easy',
-      impact: 'Medium',
-      duration: '4 weeks',
-      participants: 2458,
-      icon: <Utensils size={20} />
-    },
-    {
-      id: 2,
-      title: 'Zero Waste Week',
-      description: 'Minimize your waste production for one full week',
-      category: 'waste',
-      difficulty: 'Medium',
-      impact: 'High',
-      duration: '1 week',
-      participants: 1245,
-      icon: <ShoppingBag size={20} />
-    },
-    {
-      id: 3,
-      title: 'Public Transport Challenge',
-      description: 'Use only public transportation for all your travel needs',
-      category: 'transport',
-      difficulty: 'Medium',
-      impact: 'High',
-      duration: '2 weeks',
-      participants: 1876,
-      icon: <Car size={20} />
-    },
-    {
-      id: 4,
-      title: 'Energy Saving Sprint',
-      description: 'Reduce your home energy consumption by 20% in one month',
-      category: 'energy',
-      difficulty: 'Medium',
-      impact: 'High',
-      duration: '1 month',
-      participants: 3241,
-      icon: <Zap size={20} />
-    },
-    {
-      id: 5,
-      title: '5-Minute Shower',
-      description: 'Limit your showers to 5 minutes to conserve water',
-      category: 'water',
-      difficulty: 'Easy',
-      impact: 'Medium',
-      duration: '2 weeks',
-      participants: 4251,
-      icon: <Droplet size={20} />
-    },
-    {
-      id: 6,
-      title: 'Plastic-Free Shopping',
-      description: 'Avoid all single-use plastics when shopping for one month',
-      category: 'waste',
-      difficulty: 'Hard',
-      impact: 'High',
-      duration: '1 month',
-      participants: 1548,
-      icon: <ShoppingBag size={20} />
-    },
-    {
-      id: 7,
-      title: 'Plant Power',
-      description: 'Adopt a plant-based diet for two weeks',
-      category: 'food',
-      difficulty: 'Medium',
-      impact: 'High',
-      duration: '2 weeks',
-      participants: 2134,
-      icon: <Utensils size={20} />
-    },
-    {
-      id: 8,
-      title: 'Home Energy Audit',
-      description: 'Conduct a thorough energy audit of your home and implement changes',
-      category: 'energy',
-      difficulty: 'Medium',
-      impact: 'High',
-      duration: '1 month',
-      participants: 987,
-      icon: <Home size={20} />
-    },
-  ];
-  
-  // My active challenges
-  const myActiveChallenges = [
-    {
-      id: 2,
-      title: 'Zero Waste Week',
-      description: 'Minimize your waste production for one full week',
-      category: 'waste',
-      difficulty: 'Medium',
-      impact: 'High',
-      duration: '1 week',
-      progress: 60,
-      daysLeft: 3,
-      icon: <ShoppingBag size={20} />
-    },
-    {
-      id: 5,
-      title: '5-Minute Shower',
-      description: 'Limit your showers to 5 minutes to conserve water',
-      category: 'water',
-      difficulty: 'Easy',
-      impact: 'Medium',
-      duration: '2 weeks',
-      progress: 85,
-      daysLeft: 2,
-      icon: <Droplet size={20} />
-    }
-  ];
-  
-  // My completed challenges
-  const myCompletedChallenges = [
-    {
-      id: 1,
-      title: 'Meatless Monday',
-      description: 'Skip meat for one day a week to reduce your carbon footprint',
-      category: 'food',
-      difficulty: 'Easy',
-      impact: 'Medium',
-      completedDate: '2025-05-28',
-      impactSaved: '52 kg CO₂e',
-      icon: <Utensils size={20} />
-    }
-  ];
+  const { challenges, activeChallenges, completedChallenges, joinChallenge } = useChallenges();
 
   // Filter and search challenges
-  const filteredChallenges = challengesData
-    .filter(challenge => filter === 'all' || challenge.category === filter)
+  const filteredChallenges = challenges
+    .filter(challenge => categoryFilter === 'all' || challenge.category === categoryFilter)
+    .filter(challenge => difficultyFilter === 'all' || challenge.difficulty === difficultyFilter)
+    .filter(challenge => impactFilter === 'all' || challenge.impact === impactFilter)
     .filter(challenge => 
       challenge.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       challenge.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -231,31 +104,47 @@ const Challenges: React.FC = () => {
               
               <div className="flex space-x-2">
                 <div className="relative">
-                  <button className="px-4 py-2 border border-gray-200 rounded-lg flex items-center space-x-2 bg-white">
-                    <Filter size={16} className="text-gray-500" />
-                    <span className="text-gray-700">Category</span>
-                    <ChevronDown size={16} className="text-gray-500" />
-                  </button>
-                  
-                  {/* This would be a dropdown in the real application */}
+                  <select
+                    className="appearance-none pl-4 pr-10 py-2 border border-gray-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                  >
+                    <option value="all">All Categories</option>
+                    <option value="food">Food</option>
+                    <option value="waste">Waste</option>
+                    <option value="transport">Transport</option>
+                    <option value="energy">Energy</option>
+                    <option value="water">Water</option>
+                  </select>
+                  <ChevronDown size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-500" />
                 </div>
                 
                 <div className="relative">
-                  <button className="px-4 py-2 border border-gray-200 rounded-lg flex items-center space-x-2 bg-white">
-                    <span className="text-gray-700">Difficulty</span>
-                    <ChevronDown size={16} className="text-gray-500" />
-                  </button>
-                  
-                  {/* This would be a dropdown in the real application */}
+                  <select
+                    className="appearance-none pl-4 pr-10 py-2 border border-gray-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+                    value={difficultyFilter}
+                    onChange={(e) => setDifficultyFilter(e.target.value)}
+                  >
+                    <option value="all">All Difficulties</option>
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                  </select>
+                  <ChevronDown size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-500" />
                 </div>
                 
                 <div className="relative">
-                  <button className="px-4 py-2 border border-gray-200 rounded-lg flex items-center space-x-2 bg-white">
-                    <span className="text-gray-700">Impact</span>
-                    <ChevronDown size={16} className="text-gray-500" />
-                  </button>
-                  
-                  {/* This would be a dropdown in the real application */}
+                  <select
+                    className="appearance-none pl-4 pr-10 py-2 border border-gray-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+                    value={impactFilter}
+                    onChange={(e) => setImpactFilter(e.target.value)}
+                  >
+                    <option value="all">All Impacts</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                  </select>
+                  <ChevronDown size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-500" />
                 </div>
               </div>
             </div>
@@ -267,9 +156,9 @@ const Challenges: React.FC = () => {
                 </div>
               ) : (
                 filteredChallenges.map((challenge, index) => (
-                  <motion.div
-                    key={challenge.id}
-                    initial={{ opacity: 0, y: 20 }}
+                  <Link to={`/challenges/${challenge.id}`} key={challenge.id}>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05, duration: 0.3 }}
                     className="bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
@@ -308,11 +197,15 @@ const Challenges: React.FC = () => {
                         </div>
                       </div>
                       
-                      <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium transition-colors">
+                      <button
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium transition-colors"
+                        onClick={() => joinChallenge(challenge.id)}
+                      >
                         Join Challenge
                       </button>
                     </div>
                   </motion.div>
+                  </Link>
                 ))
               )}
             </div>
@@ -324,7 +217,7 @@ const Challenges: React.FC = () => {
             <section>
               <h2 className="text-xl font-bold text-gray-800 mb-4">Active Challenges</h2>
               
-              {myActiveChallenges.length === 0 ? (
+              {activeChallenges.length === 0 ? (
                 <div className="bg-gray-50 rounded-lg p-8 text-center">
                   <p className="text-gray-500 mb-4">You don't have any active challenges yet.</p>
                   <button 
@@ -336,10 +229,10 @@ const Challenges: React.FC = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {myActiveChallenges.map((challenge, index) => (
-                    <motion.div
-                      key={challenge.id}
-                      initial={{ opacity: 0, y: 20 }}
+                  {activeChallenges.map((challenge, index) => (
+                    <Link to={`/challenges/${challenge.id}`} key={challenge.id}>
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1, duration: 0.3 }}
                       className="bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
@@ -388,6 +281,7 @@ const Challenges: React.FC = () => {
                         </button>
                       </div>
                     </motion.div>
+                    </Link>
                   ))}
                 </div>
               )}
@@ -396,16 +290,16 @@ const Challenges: React.FC = () => {
             <section>
               <h2 className="text-xl font-bold text-gray-800 mb-4">Completed Challenges</h2>
               
-              {myCompletedChallenges.length === 0 ? (
+              {completedChallenges.length === 0 ? (
                 <div className="bg-gray-50 rounded-lg p-8 text-center">
                   <p className="text-gray-500">You haven't completed any challenges yet.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {myCompletedChallenges.map((challenge, index) => (
-                    <motion.div
-                      key={challenge.id}
-                      initial={{ opacity: 0, y: 20 }}
+                  {completedChallenges.map((challenge, index) => (
+                    <Link to={`/challenges/${challenge.id}`} key={challenge.id}>
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1, duration: 0.3 }}
                       className="bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm"
@@ -443,6 +337,7 @@ const Challenges: React.FC = () => {
                         </button>
                       </div>
                     </motion.div>
+                    </Link>
                   ))}
                 </div>
               )}
